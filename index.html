@@ -1,0 +1,42 @@
+Note you must extend the index.js to accommodate static middleware being served up by express.js
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Men's Wear eCommerce</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Men's Wear Products</h1>
+    <label for="categories">Choose a category:</label>
+    <select id="categories" onchange="loadProducts()">
+        <option value="">All Categories</option>
+        <option value="Shirts">Shirts</option>
+        <option value="Pants">Pants</option>
+        <option value="Shoes">Shoes</option>
+    </select>
+    <div id="products"></div>
+
+    <script>
+        function loadProducts() {
+            const category = $('#categories').val();
+            $.get(`/products?category=${category}`, function(products) {
+                let html = '';
+                products.forEach(product => {
+                    html += `<div>
+                                <h2>${product.name}</h2>
+                                <p>Price: $${product.price}</p>
+                                <p>Category: ${product.category}</p>
+                             </div>`;
+                });
+                $('#products').html(html);
+            });
+        }
+        
+        // Load products on page load
+        loadProducts();
+    </script>
+</body>
+</html>
