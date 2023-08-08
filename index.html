@@ -1,3 +1,54 @@
+Updated controller code to work with the html file below:
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+app.use(bodyParser.json());
+app.use(cors());
+
+const connectionString = 'mongodb://127.0.0.1:27017/mensWearDB';
+mongoose.connect(connectionString, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('Connection error', err));
+
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true, min: 0 },
+  category: { type: String, required: true },
+  inStock: { type: Boolean, default: true }
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+app.get('/products', (req, res) => {
+  const category = req.query.category;
+  const query = category ? { category } : {};
+  Product.find(query).then(products => res.json(products));
+});
+
+app.post('/products', (req, res) => {
+  const newProduct = new Product(req.body);
+  newProduct.save().then(product => res.json(product));
+});
+
+app.put('/products/:id', (req, res) => {
+  Product.findByIdAndUpdate(req.params.id, req.body).then(() => res.json({ success: true }));
+});
+
+app.delete('/products/:id', (req, res) => {
+  Product.findByIdAndDelete(req.params.id).then(() => res.json({ success: true }));
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+
+
+
 Note you must extend the index.js to accommodate static middleware being served up by express.js
 
 <!DOCTYPE html>
